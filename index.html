@@ -1,31 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Genie 🔥</title>
+<title>Omni AI 🔥</title>
+
+<style>
+body {
+    background: black;
+    color: white;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+/* 🔥 AI FACE */
+.face {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid cyan;
+    margin: 50px auto;
+    position: relative;
+    box-shadow: 0 0 20px cyan;
+}
+
+/* eyes */
+.eye {
+    width: 20px;
+    height: 20px;
+    background: cyan;
+    border-radius: 50%;
+    position: absolute;
+    top: 50px;
+    animation: blink 2s infinite;
+}
+
+.eye.left { left: 35px; }
+.eye.right { right: 35px; }
+
+@keyframes blink {
+    0%,100% { height:20px; }
+    50% { height:5px; }
+}
+
+/* pulse effect */
+.face.active {
+    box-shadow: 0 0 40px cyan;
+}
+
+input {
+    padding: 10px;
+    width: 250px;
+}
+
+button {
+    padding: 10px;
+}
+</style>
+
 </head>
-<body style="background:black;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
 
-    <h1>AI GENIE 👑</h1>
+<body>
 
-    <input id="input" placeholder="Type command..." style="padding:10px;width:250px;">
-    <button onclick="send()">Send</button>
+<h1>OMNI AI 👑</h1>
 
-    <h2 id="output"></h2>
+<div id="face" class="face">
+    <div class="eye left"></div>
+    <div class="eye right"></div>
+</div>
 
-    <script>
-        async function send() {
-            let command = document.getElementById("input").value;
+<input id="input" placeholder="Type command...">
+<button onclick="send()">Send</button>
 
-            let res = await fetch("/ai", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({command: command})
-            });
+<h2 id="output"></h2>
 
-            let data = await res.json();
-            document.getElementById("output").innerText = data.response;
-        }
-    </script>
+<script>
+async function send() {
+
+    let command = document.getElementById("input").value;
+
+    // 🔥 FACE ACTIVE ANIMATION
+    document.getElementById("face").classList.add("active");
+
+    let res = await fetch("/ai", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({command: command})
+    });
+
+    let data = await res.json();
+
+    document.getElementById("output").innerText = data.response;
+
+    setTimeout(()=>{
+        document.getElementById("face").classList.remove("active");
+    },1000);
+}
+</script>
 
 </body>
 </html>
