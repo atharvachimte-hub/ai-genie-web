@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Genie 🔥</title>
+</head>
+<body style="background:black;color:white;text-align:center;padding-top:100px;font-family:sans-serif;">
+
+    <h1>AI GENIE 👑</h1>
+
+    <input id="input" placeholder="Type command..." style="padding:10px;width:250px;">
+    <button onclick="send()">Send</button>
+
+    <h2 id="output"></h2>
+
+    <script>
+        async function send() {
+            let command = document.getElementById("input").value;
+
+            let res = await fetch("/ai", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({command: command})
+            });
+
+            let data = await res.json();
+            document.getElementById("output").innerText = data.response;
+        }
+    </script>
+
+</body>
+</html>
