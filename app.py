@@ -3,13 +3,15 @@ from flask_cors import CORS
 from datetime import datetime
 import os
 
-app = Flask(__name__, static_folder=".", static_url_path="")
+app = Flask(__name__)
 CORS(app)
 
-# ✅ FORCE INDEX.HTML LOAD
+# ✅ FORCE ROOT DIRECTORY
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 @app.route("/")
 def home():
-    return send_from_directory(os.getcwd(), "index.html")
+    return send_from_directory(BASE_DIR, "index.html")
 
 # 🔥 COMMAND ENGINE
 def command_engine(command):
