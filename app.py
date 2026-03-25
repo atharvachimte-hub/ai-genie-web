@@ -1,14 +1,16 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
+# Home route (NO TEMPLATE ERROR)
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return send_from_directory("templates", "index.html")
 
+# AI route
 @app.route("/ai", methods=["POST"])
 def ai():
     try:
@@ -37,6 +39,6 @@ def ai():
     except Exception as e:
         return jsonify({"response": f"Error: {str(e)}"})
 
-# IMPORTANT FOR RENDER
+# Render fix
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
