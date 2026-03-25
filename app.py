@@ -9,7 +9,7 @@ CORS(app)
 # 🔥 HOME PAGE FIX
 @app.route("/")
 def home():
-    return send_from_directory(os.getcwd(), "index.html")
+    return send_from_directory(".", "index.html")
 
 def command_engine(command):
 
