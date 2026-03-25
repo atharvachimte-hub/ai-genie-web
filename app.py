@@ -1,15 +1,17 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".", static_url_path="")
 CORS(app)
 
-# 🔥 FIXED HOME ROUTE
+# ✅ FORCE INDEX.HTML LOAD
 @app.route("/")
 def home():
-    return send_file("index.html")
+    return send_from_directory(os.getcwd(), "index.html")
 
+# 🔥 COMMAND ENGINE
 def command_engine(command):
 
     command = command.lower()
@@ -26,9 +28,13 @@ def command_engine(command):
     elif "website" in command:
         return "Website ready 🔥"
 
-    else:
-        return "Simple bol ❌"
+    elif "reel" in command:
+        return "Reel system ready 🎬"
 
+    else:
+        return "Simple bol bhava ❌"
+
+# 🔥 API
 @app.route("/ai", methods=["POST"])
 def ai():
     data = request.json
@@ -38,5 +44,6 @@ def ai():
 
     return jsonify({"response": response})
 
+# 🔥 RUN
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
