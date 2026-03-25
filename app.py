@@ -1,53 +1,48 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from datetime import datetime
-import os
 
-app = Flask(__name__, static_folder=".")
+app = Flask(__name__)
 CORS(app)
 
-# ✅ DIRECT FILE LOAD (NO PATH ISSUE)
+# Home route
 @app.route("/")
 def home():
-    return send_file("index.html")
+    return render_template("index.html")
 
-# 🔥 COMMAND ENGINE
-def command_engine(command):
-
-    command = command.lower()
-
-    if "search" in command:
-        return "Search working 🚀"
-
-    elif "time" in command:
-        return f"Time aahe {datetime.now().strftime('%H:%M')}"
-
-    elif "billing" in command:
-        return "Billing software ready 💰"
-
-    elif "website" in command:
-        return "Website ready 🔥"
-
-    elif "reel" in command:
-        return "Reel system ready 🎬"
-
-    else:
-        return "Simple bol ❌"
-
-# 🔥 API
+# AI route
 @app.route("/ai", methods=["POST"])
 def ai():
-    data = request.json
-    command = data.get("command")
+    try:
+        data = request.get_json()
 
-    response = command_engine(command)
+        if not data or "message" not in data:
+            return jsonify({"response": "No message received"})
 
-    return jsonify({"response": response})
+        user_message = data["message"].lower()
 
-# 🔥 STATIC FILE SUPPORT (IMPORTANT)
-@app.route("/<path:path>")
-def static_files(path):
-    return send_file(path)
+        # Basic command system
+        if "hello" in user_message:
+            reply = "Hello bhava 👑, Omni AI ready aahe!"
+        
+        elif "time" in user_message:
+            from datetime import datetime
+            now = datetime.now().strftime("%H:%M")
+            reply = f"Current time aahe {now}"
 
+        elif "open youtube" in user_message:
+            reply = "YouTube open karaycha command backend madhe add karto next step madhe"
+
+        elif "good morning" in user_message:
+            reply = "Good morning bhava 🔥 aaj full focus mode madhe kaam karu!"
+
+        else:
+            reply = f"Tu mhanlas: {user_message} — me samjtoy, next upgrade madhe smart AI reply yenar"
+
+        return jsonify({"response": reply})
+
+    except Exception as e:
+        return jsonify({"response": f"Error aala: {str(e)}"})
+
+# Run
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
