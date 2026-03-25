@@ -1,17 +1,15 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from datetime import datetime
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".")
 CORS(app)
 
-# ✅ FORCE ROOT DIRECTORY
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
+# ✅ DIRECT FILE LOAD (NO PATH ISSUE)
 @app.route("/")
 def home():
-    return send_from_directory(BASE_DIR, "index.html")
+    return send_file("index.html")
 
 # 🔥 COMMAND ENGINE
 def command_engine(command):
@@ -34,7 +32,7 @@ def command_engine(command):
         return "Reel system ready 🎬"
 
     else:
-        return "Simple bol bhava ❌"
+        return "Simple bol ❌"
 
 # 🔥 API
 @app.route("/ai", methods=["POST"])
@@ -46,6 +44,10 @@ def ai():
 
     return jsonify({"response": response})
 
-# 🔥 RUN
+# 🔥 STATIC FILE SUPPORT (IMPORTANT)
+@app.route("/<path:path>")
+def static_files(path):
+    return send_file(path)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
