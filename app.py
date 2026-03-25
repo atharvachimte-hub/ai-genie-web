@@ -1,41 +1,33 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from datetime import datetime
-import os
 
 app = Flask(__name__)
 CORS(app)
 
-# 🔥 HOME PAGE FIX
+# 🔥 FIXED HOME ROUTE
 @app.route("/")
 def home():
-    return send_from_directory(".", "index.html")
+    return send_file("index.html")
 
 def command_engine(command):
 
     command = command.lower()
 
-    if any(word in command for word in ["open chrome", "chrome kholo", "chrome open"]):
-        return "Chrome manually open kar"
+    if "search" in command:
+        return "Search working 🚀"
 
-    elif any(word in command for word in ["search", "khoj", "dhund"]):
-        query = command.replace("search", "")
-        return f"https://www.google.com/search?q={query}"
-
-    elif any(word in command for word in ["time", "vel", "samay"]):
+    elif "time" in command:
         return f"Time aahe {datetime.now().strftime('%H:%M')}"
 
-    elif any(word in command for word in ["billing", "invoice"]):
-        return "Billing software 7 divas madhe ready 💰"
+    elif "billing" in command:
+        return "Billing software ready 💰"
 
-    elif any(word in command for word in ["website", "web"]):
-        return "Premium website 2 divas madhe ready 🔥"
-
-    elif any(word in command for word in ["reel", "video"]):
-        return "Reel ready flow 💰"
+    elif "website" in command:
+        return "Website ready 🔥"
 
     else:
-        return "Simple bol, samjat nahi ❌"
+        return "Simple bol ❌"
 
 @app.route("/ai", methods=["POST"])
 def ai():
