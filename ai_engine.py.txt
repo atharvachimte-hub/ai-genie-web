@@ -1,5 +1,34 @@
 import webbrowser
 import os
+import requests
+
+# 👉 इथे तुझा OpenAI API key टाक
+OPENAI_API_KEY = "YOUR_API_KEY_HERE"
+
+def ask_ai(message):
+    try:
+        url = "https://api.openai.com/v1/chat/completions"
+
+        headers = {
+            "Authorization": f"Bearer {OPENAI_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "model": "gpt-4o-mini",
+            "messages": [
+                {"role": "system", "content": "You are a smart AI assistant like Jarvis."},
+                {"role": "user", "content": message}
+            ]
+        }
+
+        res = requests.post(url, headers=headers, json=data)
+        result = res.json()
+
+        return result["choices"][0]["message"]["content"]
+
+    except:
+        return "AI error bhava"
 
 def process_command(message):
     msg = message.lower()
@@ -7,7 +36,7 @@ def process_command(message):
     # 🔥 AUTOMATION
     if "open youtube" in msg:
         webbrowser.open("https://youtube.com")
-        return "Opening YouTube bhava 🔥"
+        return "Opening YouTube 🔥"
 
     if "open google" in msg:
         webbrowser.open("https://google.com")
@@ -18,7 +47,6 @@ def process_command(message):
         webbrowser.open(f"https://www.google.com/search?q={query}")
         return f"Searching {query}"
 
-    # 🔥 PC CONTROL (basic)
     if "open calculator" in msg:
         try:
             os.system("calc")
@@ -26,4 +54,5 @@ def process_command(message):
             pass
         return "Opening Calculator"
 
-    return f"Tu mhanlas: {message}"
+    # 🔥 AI BRAIN
+    return ask_ai(message)
