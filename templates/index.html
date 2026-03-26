@@ -1,58 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Omni AI</title>
+
 <style>
-body {background:#0b0f1a;color:white;font-family:Arial;}
-.chat {height:400px;overflow:auto;border:1px solid #333;padding:10px;}
-.msg {margin:10px;padding:10px;border-radius:10px;}
-.user {background:#1e293b;text-align:right;}
-.ai {background:#0f172a;}
+body {
+    margin:0;
+    background:#0b0f1a;
+    color:white;
+    font-family:Arial;
+}
+
+.container {
+    width:80%;
+    margin:auto;
+    margin-top:20px;
+}
+
+.chat-box {
+    height:400px;
+    overflow-y:auto;
+    border:1px solid #1e293b;
+    padding:10px;
+    border-radius:10px;
+    background:#020617;
+}
+
+.message {
+    padding:10px;
+    margin:10px;
+    border-radius:10px;
+    max-width:70%;
+}
+
+.user {
+    background:#1e293b;
+    margin-left:auto;
+    text-align:right;
+}
+
+.ai {
+    background:#0f172a;
+}
+
+button {
+    padding:10px;
+    margin:5px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>👑 Omni AI</h2>
+<div class="container">
 
-<div id="chat" class="chat"></div>
+<h2>👑 Omni AI Dashboard</h2>
 
-<input id="input">
-<button onclick="send()">Send</button>
-<button onclick="voice()">🎤</button>
+<!-- COMMAND BOX -->
+<input id="input" placeholder="Type your command..." style="width:70%;padding:10px;">
+<button onclick="send()">Send Command</button>
+<button onclick="startVoice()">🎤 Start Voice</button>
+
+<!-- CHAT -->
+<div id="chat" class="chat-box"></div>
+
+</div>
 
 <script>
-function add(text, type){
- let div=document.createElement("div");
- div.className="msg "+type;
- div.innerText=text;
- document.getElementById("chat").appendChild(div);
+
+function addMessage(text, type) {
+    const chat = document.getElementById("chat");
+    const div = document.createElement("div");
+    div.className = "message " + type;
+    div.innerText = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 }
 
-async function send(){
- let text=document.getElementById("input").value;
- add(text,"user");
+// 🔥 MAIN SEND (FIXED)
+async function send() {
+    const input = document.getElementById("input");
+    const text = input.value;
 
- let res=await fetch("/ai",{
- method:"POST",
- headers:{"Content-Type":"application/json"},
- body:JSON.stringify({message:text})
- });
+    if (!text) return;
 
- let data=await res.json();
- add(data.reply,"ai");
+    // 👤 user message
+    addMessage(text, "user");
+
+    input.value = "";
+
+    try {
+        const response = await fetch("/ai", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+
+        // 🤖 AI reply (NEW FIX)
+        addMessage(data.reply, "ai");
+
+        speak(data.reply);
+
+    } catch (err) {
+        addMessage("Error aala bhava 😓", "ai");
+    }
 }
 
-function voice(){
- let rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
- rec.lang="hi-IN";
- rec.onresult=e=>{
-   let t=e.results[0][0].transcript;
-   document.getElementById("input").value=t;
-   send();
- };
- rec.start();
+// 🎤 VOICE INPUT (IMPROVED)
+function startVoice() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+    recognition.lang = "hi-IN";
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+
+        document.getElementById("input").value = transcript;
+
+        send();
+    };
+
+    recognition.start();
 }
+
+// 🔊 VOICE OUTPUT
+function speak(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "hi-IN";
+    speech.rate = 1;
+    window.speechSynthesis.speak(speech);
+}
+
 </script>
 
 </body>
