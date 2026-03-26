@@ -1,0 +1,29 @@
+import webbrowser
+import os
+
+def process_command(message):
+    msg = message.lower()
+
+    # 🔥 AUTOMATION
+    if "open youtube" in msg:
+        webbrowser.open("https://youtube.com")
+        return "Opening YouTube bhava 🔥"
+
+    if "open google" in msg:
+        webbrowser.open("https://google.com")
+        return "Opening Google 🚀"
+
+    if "search" in msg:
+        query = msg.replace("search", "")
+        webbrowser.open(f"https://www.google.com/search?q={query}")
+        return f"Searching {query}"
+
+    # 🔥 PC CONTROL (basic)
+    if "open calculator" in msg:
+        try:
+            os.system("calc")
+        except:
+            pass
+        return "Opening Calculator"
+
+    return f"Tu mhanlas: {message}"
