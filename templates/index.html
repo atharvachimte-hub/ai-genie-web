@@ -6,51 +6,68 @@
 
 <style>
 body {
+    margin: 0;
     background: #0b0f1a;
     color: white;
     font-family: Arial;
 }
 
-#chat {
+.container {
     width: 60%;
     margin: auto;
     margin-top: 50px;
+}
+
+.chat-box {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #1e293b;
+    padding: 10px;
+    border-radius: 10px;
+    background: #020617;
 }
 
 .message {
     padding: 10px;
     margin: 10px;
     border-radius: 10px;
+    max-width: 70%;
 }
 
 .user {
-    background: #1e2a3a;
+    background: #1e293b;
+    margin-left: auto;
     text-align: right;
 }
 
 .ai {
     background: #0f172a;
-    text-align: left;
 }
 
 input {
-    width: 80%;
+    width: 70%;
     padding: 10px;
 }
 
 button {
     padding: 10px;
+    margin: 5px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="chat"></div>
+<div class="container">
+    <h2>👑 Omni AI</h2>
 
-<div style="text-align:center;">
-    <input id="input" placeholder="Type something bhava..." />
-    <button onclick="send()">Send</button>
+    <div id="chat" class="chat-box"></div>
+
+    <div style="text-align:center;">
+        <input id="input" placeholder="Type or speak bhava..." />
+        <button onclick="send()">Send</button>
+        <button onclick="startVoice()">🎤 Voice</button>
+    </div>
 </div>
 
 <script>
@@ -60,6 +77,7 @@ function addMessage(text, type) {
     div.className = "message " + type;
     div.innerText = text;
     chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
 }
 
 async function send() {
@@ -68,12 +86,9 @@ async function send() {
 
     if (!text) return;
 
-    // 👤 User message
     addMessage(text, "user");
-
     input.value = "";
 
-    // 🔥 AI CALL
     const response = await fetch("/ai", {
         method: "POST",
         headers: {
@@ -84,8 +99,33 @@ async function send() {
 
     const data = await response.json();
 
-    // 🤖 AI reply
     addMessage(data.reply, "ai");
+
+    speak(data.reply);
+}
+
+// 🎤 Voice Input (Hindi + Marathi support)
+function startVoice() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+    recognition.lang = "hi-IN"; // Hindi + Marathi mix
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("input").value = transcript;
+        send();
+    };
+
+    recognition.start();
+}
+
+// 🔊 Voice Output
+function speak(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "hi-IN";
+    speech.rate = 1;
+    window.speechSynthesis.speak(speech);
 }
 </script>
 
