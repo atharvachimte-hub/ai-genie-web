@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 from openai import OpenAI
@@ -6,56 +6,48 @@ from openai import OpenAI
 app = Flask(__name__)
 CORS(app)
 
-# 🔑 OpenAI Setup
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# 🧠 SYSTEM PROMPT (MAIN BRAIN)
 SYSTEM_PROMPT = """
-तू एक smart AI assistant आहेस (Omni AI / Jarvis level)
+तू Omni AI आहेस — smart, friendly bhava tone मध्ये बोल.
 
 Rules:
-- Always reply in smooth Marathi + Hindi + simple English mix
-- Never repeat user input
-- Think and give helpful, practical answer
-- Keep answer short, smart, actionable
-- Sound like friendly bhava tone 👑
-- Avoid robotic tone
+- Marathi + Hindi + simple English mix
+- User input repeat करू नको
+- Short, smart, useful उत्तर दे
+- Human सारखं बोल
 
-Capabilities:
-- Prompt generation (image/video/reels)
-- Billing software ideas
-- Business suggestions
-- Automation help
+काम:
+- software ideas
+- billing system
+- business help
+- automation
 """
+
+@app.route("/")
+def home():
+    return send_from_directory(".", "index.html")
 
 @app.route("/ai", methods=["POST"])
 def ai():
-    try:
-        data = request.json
-        user_input = data.get("message", "")
+    data = request.json
+    user_input = data.get("message", "")
 
-        if not user_input:
-            return jsonify({"reply": "काय मदत करू भावा?"})
+    if not user_input:
+        return jsonify({"reply": "बोल भावा, काय मदत करू?"})
 
-        # 🧠 REAL AI CALL
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_input}
-            ],
-            temperature=0.7,
-            max_tokens=300
-        )
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_input}
+        ],
+        temperature=0.8
+    )
 
-        ai_reply = response.choices[0].message.content.strip()
+    reply = response.choices[0].message.content.strip()
 
-        return jsonify({"reply": ai_reply})
-
-    except Exception as e:
-        print("ERROR:", str(e))
-        return jsonify({"reply": "थोडा issue आला भावा, परत try कर 🙏"})
-        
+    return jsonify({"reply": reply})
 
 if __name__ == "__main__":
     app.run(debug=True)
